@@ -58,10 +58,10 @@ local FEATURES: { [string]: (Model, CFrame, number, any) -> () } = {
 		end
 	end,
 	ring = function(m, o, s, look)
-		part(m, Vector3.new(0.14, 3.0 * s, 3.0 * s), o * CFrame.Angles(0, 0, math.pi / 2), look.accent, NEON, Enum.PartType.Cylinder)
+		part(m, Vector3.new(0.14, 3.0 * s, 3.0 * s), o * CFrame.new(0, -0.5 * s, 0) * CFrame.Angles(0, 0, math.pi / 2), look.accent, NEON, Enum.PartType.Cylinder)
 		for i = 0, 2 do
 			local a = i / 3 * math.pi * 2
-			ball(m, 0.22 * s, o * CFrame.new(math.cos(a) * 1.5 * s, 0.1 * s, math.sin(a) * 1.5 * s), Color3.new(1, 1, 1), NEON)
+			ball(m, 0.22 * s, o * CFrame.new(math.cos(a) * 1.5 * s, -0.5 * s, math.sin(a) * 1.5 * s), Color3.new(1, 1, 1), NEON)
 		end
 	end,
 	fin = function(m, o, s, look)

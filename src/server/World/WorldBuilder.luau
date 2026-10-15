@@ -31,6 +31,10 @@ local function setupLighting()
 			old:Destroy()
 		end
 	end
+	local sky = Instance.new("Sky") -- engine default skybox textures; Rojo-built places have none
+	sky.Name = "GlitchSky"
+	sky.StarCount = 3000
+	sky.Parent = Lighting
 	local atm = Instance.new("Atmosphere")
 	atm.Name = "GlitchAtmosphere"
 	atm.Density = 0.38

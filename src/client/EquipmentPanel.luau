@@ -93,7 +93,7 @@ function EquipmentPanel.create(gui: ScreenGui)
 	end
 
 	local function statusBadge(parent: Instance, text: string, color: Color3)
-		UIKit.label({ Size = UDim2.fromOffset(UIKit.px(90), UIKit.px(22)), Position = UDim2.new(1, -UIKit.px(98), 0, 8), Text = text, TextSize = UIKit.px(12), Font = T.fontBold, TextColor3 = color, TextXAlignment = Enum.TextXAlignment.Right, TextWrapped = false, Parent = parent })
+		UIKit.label({ Size = UDim2.fromOffset(UIKit.px(140), UIKit.px(22)), Position = UDim2.new(1, -UIKit.px(148), 0, 8), Text = text, TextSize = UIKit.px(12), Font = T.fontBold, TextColor3 = color, TextXAlignment = Enum.TextXAlignment.Right, TextWrapped = false, Parent = parent })
 	end
 
 	local function render()
@@ -125,7 +125,7 @@ function EquipmentPanel.create(gui: ScreenGui)
 			local card = UIKit.new("Frame", { Size = UDim2.new(1, -8, 0, height), BackgroundColor3 = if isNext then T.panel else T.bg, BorderSizePixel = 0, LayoutOrder = i, Parent = list }, {
 				UIKit.corner(10), UIKit.stroke(if isNext then T.cyan else T.panel2, if isNext then 2 else 1, if isNext then 0.2 else 0.4),
 			})
-			UIKit.title({ Size = UDim2.new(0.6, 0, 0, UIKit.px(24)), Position = UDim2.fromOffset(12, 6), Text = item.name, TextSize = UIKit.px(17), TextWrapped = false, TextColor3 = if isOwned or isNext then T.text else T.dim, Parent = card })
+			UIKit.title({ Size = UDim2.new(1, -UIKit.px(170), 0, UIKit.px(24)), Position = UDim2.fromOffset(12, 6), Text = item.name, TextSize = UIKit.px(17), TextWrapped = false, TextColor3 = if isOwned or isNext then T.text else T.dim, Parent = card })
 			local sub
 			if isGadget then
 				sub = item.desc

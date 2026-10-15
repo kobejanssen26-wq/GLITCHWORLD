@@ -168,7 +168,7 @@ ok = Rules.buyResearch(p, "bogus"); eq(ok, false, "bogus node")
 
 -- ===== secrets =====
 p = Profile.default(); s = Rules.computeStats(p)
-local sec = Rules.collectSecret(p, s, "shard_1"); eq(sec.credits, 150, "shard credits")
+local sec = Rules.collectSecret(p, s, "shard_1"); eq(sec.credits, Config.Secrets.shardReward.credits, "shard credits")
 check(Rules.collectSecret(p, s, "shard_1") == nil, "shard not collectable twice")
 check(Rules.collectSecret(p, s, "nope") == nil, "unknown shard")
 for _, sh in WorldData.Secrets do Rules.collectSecret(p, s, sh.id) end

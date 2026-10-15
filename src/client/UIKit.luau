@@ -209,6 +209,7 @@ function UIKit.panel(gui: Instance, title: string, onClose: () -> ()): (Frame, F
 		BackgroundColor3 = T.bg,
 		BorderSizePixel = 0,
 		Visible = false,
+		Active = true, -- sink clicks so interacting with a menu never fires the absorber
 		ZIndex = 10,
 		Parent = gui,
 	}, {

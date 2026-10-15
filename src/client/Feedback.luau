@@ -44,7 +44,7 @@ end
 function Feedback.toast(text: string, tone: string?)
 	local color = if tone == "good" then T.good elseif tone == "warn" then T.warn elseif tone == "bad" then T.bad else T.cyan
 	local f = UIKit.new("Frame", {
-		Size = UDim2.new(1, 0, 0, UIKit.px(34)), BackgroundColor3 = T.bg, BackgroundTransparency = 0.12, BorderSizePixel = 0, LayoutOrder = -math.floor(os.clock() * 100), Parent = toastHolder,
+		Size = UDim2.new(1, 0, 0, UIKit.px(34)), BackgroundColor3 = T.bg, BackgroundTransparency = 0.12, BorderSizePixel = 0, LayoutOrder = math.floor(os.clock() * 100), Parent = toastHolder,
 	}, { UIKit.corner(8), UIKit.stroke(color, 1.5, 0.15) })
 	UIKit.label({ Size = UDim2.new(1, -16, 1, 0), Position = UDim2.fromOffset(8, 0), Text = text, TextSize = UIKit.px(14), Font = T.fontBold, TextXAlignment = Enum.TextXAlignment.Center, TextWrapped = true, Parent = f })
 	table.insert(toasts, f)
@@ -84,12 +84,12 @@ local function runBanner()
 		while #bannerQueue > 0 do
 			local b = table.remove(bannerQueue, 1) :: any
 			local f = UIKit.new("Frame", {
-				Size = UDim2.fromOffset(math.floor(360 * UIKit.factor()), UIKit.px(70)), AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -90), BackgroundColor3 = T.bg,
+				Size = UDim2.fromOffset(math.floor(380 * UIKit.factor()), UIKit.px(92)), AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -90), BackgroundColor3 = T.bg,
 				BackgroundTransparency = 0.05, BorderSizePixel = 0, Parent = bannerHolder,
 			}, { UIKit.corner(12), UIKit.stroke(b.color, 2.5, 0) })
 			UIKit.title({ Size = UDim2.new(1, -16, 0, UIKit.px(34)), Position = UDim2.fromOffset(8, 6), Text = b.title, TextSize = UIKit.px(22), TextColor3 = b.color, TextXAlignment = Enum.TextXAlignment.Center, TextWrapped = false, Parent = f })
-			UIKit.label({ Size = UDim2.new(1, -16, 0, UIKit.px(24)), Position = UDim2.new(0, 8, 0, UIKit.px(38)), Text = b.sub, TextSize = UIKit.px(13), TextColor3 = T.text, TextXAlignment = Enum.TextXAlignment.Center, Parent = f })
-			TweenService:Create(f, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0.5, 0, 0, math.floor(100 * UIKit.factor())) }):Play()
+			UIKit.label({ Size = UDim2.new(1, -16, 0, UIKit.px(44)), Position = UDim2.new(0, 8, 0, UIKit.px(40)), Text = b.sub, TextSize = UIKit.px(13), TextColor3 = T.text, TextXAlignment = Enum.TextXAlignment.Center, Parent = f })
+			TweenService:Create(f, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0.5, 0, 0.2, 0) }):Play()
 			task.wait(if #bannerQueue > 0 then 2.0 else 3.0)
 			TweenService:Create(f, TweenInfo.new(0.3), { Position = UDim2.new(0.5, 0, 0, -90) }):Play()
 			task.wait(0.35)
@@ -273,11 +273,12 @@ end
 
 function Feedback.init(gui: ScreenGui)
 	local f = UIKit.factor()
+	-- toasts stack upward from the bottom centre, above the contextual hint line
 	toastHolder = UIKit.new("Frame", {
-		Name = "Toasts", Size = UDim2.fromOffset(math.floor(360 * f), 0), AutomaticSize = Enum.AutomaticSize.Y, Position = UDim2.new(0.5, 0, 0, math.floor(96 * f)),
-		AnchorPoint = Vector2.new(0.5, 0), BackgroundTransparency = 1, Parent = gui,
+		Name = "Toasts", Size = UDim2.fromOffset(math.floor((if UIKit.isTouch() then 280 else 360) * f), 0), AutomaticSize = Enum.AutomaticSize.Y, Position = UDim2.new(0.5, 0, 1, -math.floor(120 * f)),
+		AnchorPoint = Vector2.new(0.5, 1), BackgroundTransparency = 1, Parent = gui,
 	})
-	UIKit.list(toastHolder, 4)
+	UIKit.list(toastHolder, 4).VerticalAlignment = Enum.VerticalAlignment.Bottom
 	bannerHolder = UIKit.new("Frame", { Name = "Banners", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Parent = gui })
 	Remotes.get("Notify").OnClientEvent:Connect(function(n)
 		local h = type(n) == "table" and handlers[n.kind]

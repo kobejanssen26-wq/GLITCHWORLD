@@ -12,6 +12,7 @@ local UIKit = require(Client.UIKit)
 local Menus = require(Client.Menus)
 local Sfx = require(Client.Sfx)
 
+local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 
 local gui = Instance.new("ScreenGui")
@@ -32,6 +33,12 @@ local function safe(name: string, fn: () -> ())
 		warn(("[GlitchWorld] %s failed to start: %s"):format(name, tostring(err)))
 	end
 end
+
+-- the default hotbar / health bar are not used by this game
+pcall(function()
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
+end)
 
 -- state first: everything else renders from it
 Remotes.get("State").OnClientEvent:Connect(function(snapshot)

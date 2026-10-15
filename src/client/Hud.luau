@@ -1,5 +1,7 @@
 -- Compact HUD: credits / backpack / rank (top-left), objective (top-centre), valley % (top-right),
 -- menu buttons (right), contextual hint + mobile buttons (bottom). Everything is read from the server snapshot.
+local UserInputService = game:GetService("UserInputService")
+
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Config = require(Shared.Config)
 local Remotes = require(Shared.Remotes)
@@ -17,7 +19,7 @@ local dots: { [string]: Frame } = {}
 local function card(parent: Instance, size: UDim2, pos: UDim2?, anchor: Vector2?): Frame
 	return UIKit.new("Frame", {
 		Size = size, Position = pos or UDim2.new(), AnchorPoint = anchor or Vector2.new(0, 0),
-		BackgroundColor3 = T.bg, BackgroundTransparency = 0.18, BorderSizePixel = 0, Parent = parent,
+		BackgroundColor3 = T.bg, BackgroundTransparency = 0.18, BorderSizePixel = 0, Active = true, Parent = parent,
 	}, { UIKit.corner(10), UIKit.stroke(T.panel2, 1.5, 0.2) })
 end
 
@@ -61,39 +63,48 @@ function Hud.build(gui: ScreenGui)
 	refs.valley = vSet
 	refs.valleyNext = UIKit.label({ Size = UDim2.new(1, 0, 0, UIKit.px(14)), Position = UDim2.new(0, 0, 1, -UIKit.px(14)), Text = "", TextSize = UIKit.px(10), TextColor3 = T.dim, TextWrapped = false, Parent = tr })
 
-	-- ===== right column: menu buttons =====
-	local col = UIKit.new("Frame", { Size = UDim2.fromOffset(math.floor((if touch then 100 else 120) * f), 0), AutomaticSize = Enum.AutomaticSize.Y, Position = UDim2.new(1, -10, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5), BackgroundTransparency = 1, Parent = gui })
-	UIKit.list(col, 6)
+	-- ===== menu buttons: right column on desktop, compact bar under the valley card on touch =====
 	local defs = {
 		{ "equipment", "Upgrades" }, { "echoes", "Echoes" }, { "research", "Research" }, { "goals", "Goals" }, { "settings", "Settings" },
 	}
+	local col
+	if touch then
+		col = UIKit.new("Frame", {
+			Name = "MenuBar", Size = UDim2.fromOffset(5 * math.floor(64 * f) + 4 * 4, math.floor(30 * f)), Position = UDim2.new(1, -10, 0, 10 + math.floor(78 * f) + 4),
+			AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 1, Parent = gui,
+		})
+		UIKit.list(col, 4, true)
+	else
+		col = UIKit.new("Frame", { Name = "MenuColumn", Size = UDim2.fromOffset(math.floor(120 * f), 0), AutomaticSize = Enum.AutomaticSize.Y, Position = UDim2.new(1, -10, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5), BackgroundTransparency = 1, Parent = gui })
+		UIKit.list(col, 6)
+	end
 	for i, d in defs do
 		local b = UIKit.button({
-			Size = UDim2.new(1, 0, 0, math.floor((if touch then 40 else 34) * f)), Text = d[2], LayoutOrder = i,
-			style = "ghost", BackgroundTransparency = 0.12, TextSize = UIKit.px(14), Parent = col,
+			Size = if touch then UDim2.fromOffset(math.floor(64 * f), math.floor(30 * f)) else UDim2.new(1, 0, 0, math.floor(34 * f)), Text = d[2], LayoutOrder = i,
+			style = "ghost", BackgroundTransparency = 0.12, TextSize = if touch then 11 else UIKit.px(14), Parent = col,
 		}, function()
 			Menus.toggle(d[1])
 		end)
 		UIKit.stroke(T.panel2, 1.2, 0.2).Parent = b
 		menuButtons[d[1]] = b
-		dots[d[1]] = UIKit.new("Frame", { Size = UDim2.fromOffset(12, 12), Position = UDim2.new(1, -4, 0, 4), AnchorPoint = Vector2.new(1, 0), BackgroundColor3 = T.warn, Visible = false, ZIndex = 5, Parent = b }, { UIKit.corner(6) })
+		dots[d[1]] = UIKit.new("Frame", { Size = UDim2.fromOffset(12, 12), Position = UDim2.new(1, -2, 0, 2), AnchorPoint = Vector2.new(1, 0), BackgroundColor3 = T.warn, Visible = false, ZIndex = 5, Parent = b }, { UIKit.corner(6) })
 	end
 
 	-- ===== bottom-centre: contextual hint =====
 	refs.hint = UIKit.label({
-		Size = UDim2.fromOffset(math.floor(420 * f), UIKit.px(22)), Position = UDim2.new(0.5, 0, 1, -math.floor((if touch then 92 else 78) * f)), AnchorPoint = Vector2.new(0.5, 1),
+		Size = UDim2.fromOffset(math.floor((if touch then 280 else 420) * f), UIKit.px(22)), Position = UDim2.new(0.5, 0, 1, -math.floor((if touch then 92 else 78) * f)), AnchorPoint = Vector2.new(0.5, 1),
 		Text = "", TextSize = UIKit.px(14), TextXAlignment = Enum.TextXAlignment.Center, Font = T.fontBold, TextStrokeTransparency = 0.5, TextWrapped = false, Parent = gui,
 	})
 
 	-- ===== touch buttons (absorb / overcharge); desktop gets key hints instead =====
 	refs.absorbBtn = UIKit.new("TextButton", {
-		Name = "AbsorbButton", Size = UDim2.fromOffset(math.floor(104 * f), math.floor(104 * f)), Position = UDim2.new(1, -math.floor(36 * f), 1, -math.floor(44 * f)), AnchorPoint = Vector2.new(1, 1),
+		Name = "AbsorbButton", Size = UDim2.fromOffset(math.floor(104 * f), math.floor(104 * f)), Position = UDim2.new(1, -math.floor(150 * f), 1, -math.floor(40 * f)), AnchorPoint = Vector2.new(1, 1),
 		BackgroundColor3 = T.cyan, BackgroundTransparency = 0.15, Text = "ABSORB", Font = T.fontTitle, TextSize = UIKit.px(18), TextColor3 = Color3.fromRGB(14, 12, 28),
-		AutoButtonColor = false, Visible = touch, Parent = gui,
+		AutoButtonColor = false, Visible = UserInputService.TouchEnabled, Parent = gui, -- also on touch laptops / hybrids
 	}, { UIKit.corner(60), UIKit.stroke(Color3.new(1, 1, 1), 2, 0.4) })
 	refs.boostBtn = UIKit.button({
 		Name = "BoostButton", Size = UDim2.fromOffset(math.floor((if touch then 80 else 120) * f), math.floor((if touch then 80 else 38) * f)),
-		Position = if touch then UDim2.new(1, -math.floor(150 * f), 1, -math.floor(150 * f)) else UDim2.new(0.5, math.floor(150 * f), 1, -math.floor(14 * f)),
+		Position = if touch then UDim2.new(1, -math.floor(150 * f), 1, -math.floor(160 * f)) else UDim2.new(0.5, math.floor(150 * f), 1, -math.floor(14 * f)),
 		AnchorPoint = if touch then Vector2.new(1, 1) else Vector2.new(0.5, 1), Text = "OVERCHARGE", style = "primary", BackgroundColor3 = T.purple, TextColor3 = Color3.new(1, 1, 1),
 		TextSize = UIKit.px(12), Visible = false, Parent = gui,
 	}, function()
@@ -194,7 +205,8 @@ function Hud.tick()
 	if owns then
 		local elapsed = os.clock() - d._at
 		local boost, cd = d.boostLeft - elapsed, d.gadgetCooldown - elapsed
-		refs.boostBtn.Text = if boost > 0 then ("ACTIVE %ds"):format(math.ceil(boost)) elseif cd > 0 then ("Ready in %ds"):format(math.ceil(cd)) else "OVERCHARGE [Q]"
+		local touch = UIKit.isTouch()
+		refs.boostBtn.Text = if boost > 0 then ("%ds"):format(math.ceil(boost)) elseif cd > 0 then ("%ds"):format(math.ceil(cd)) elseif touch then "BOOST" else "OVERCHARGE [Q]"
 	end
 end
 

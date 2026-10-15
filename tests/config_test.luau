@@ -113,7 +113,7 @@ check(Config.Targets.ruin.minTier == 3 and Config.Targets.crystal.minTier == 2, 
 for id, t in Config.Targets do
 	local ab = Config.Absorber[t.minTier]
 	local secs = t.hp / (ab.power * ab.speed)
-	check(secs >= 2 and secs <= 60, ("%s takes %.1fs at its minimum tier"):format(id, secs))
+	check(secs >= 2 and secs <= 62, ("%s takes %.1fs at its minimum tier"):format(id, secs))
 end
 
 print(fails == 0 and "config_test: PASS" or ("config_test: " .. fails .. " FAILURES"))

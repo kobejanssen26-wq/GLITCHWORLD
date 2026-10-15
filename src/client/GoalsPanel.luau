@@ -106,7 +106,7 @@ function GoalsPanel.create(gui: ScreenGui)
 					if State.restored[t.id] then cap += 1 end
 				end
 			end
-			row(30, ("Glitch Obelisks: %d / %d"):format(ob, ot), "Unusual corrupted monuments far from the paths. Big payouts. Needs an Improved Absorber.", T.purple, ob / ot)
+			row(30, ("Glitch Obelisks: %d / %d"):format(ob, ot), "Unusual corrupted monuments far from the paths. Big payouts. Needs an Advanced Absorber.", T.purple, ob / ot)
 			row(31, ("Glitch Capsules opened: %d / %d"):format(cap, ct), "Each capsule traps an Echo. Open them all and check the Echo Index for hints.", T.cyan, cap / ct)
 		end
 	end

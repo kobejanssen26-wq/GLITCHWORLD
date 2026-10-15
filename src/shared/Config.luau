@@ -81,18 +81,18 @@ Config.Gadgets = {
 -- category: used by Echo/lens bonuses. frag/xp are BASE values. hp = absorption required.
 -- permanent: restoring it is saved forever and counts toward the area %.  renew: seconds until it regrows (per player).
 Config.Targets = {
-	grass = { name = "Corrupted Grass", category = "plant", hp = 10, frag = 4, xp = 2, minTier = 1, permanent = true, weight = 1, radius = 3 },
+	grass = { name = "Corrupted Grass", category = "plant", hp = 8, frag = 4, xp = 2, minTier = 1, permanent = true, weight = 1, radius = 3 },
 	bush = { name = "Glitched Bush", category = "plant", hp = 26, frag = 10, xp = 4, minTier = 1, permanent = true, weight = 1, radius = 3 },
 	tree = { name = "Withered Tree", category = "plant", hp = 70, frag = 28, xp = 8, minTier = 1, permanent = true, weight = 2, radius = 5 },
 	crystal = { name = "Dull Crystal", category = "crystal", hp = 220, frag = 90, xp = 20, minTier = 2, permanent = true, weight = 3, radius = 4 },
-	ruin = { name = "Broken Ruin", category = "structure", hp = 450, frag = 250, xp = 50, minTier = 3, permanent = true, weight = 6, radius = 7 },
-	capsule = { name = "Glitch Capsule", category = "echo", hp = 140, frag = 0, xp = 60, minTier = 1, permanent = true, weight = 0, radius = 4 },
-	anomaly = { name = "Glitch Obelisk", category = "energy", hp = 400, frag = 450, xp = 100, minTier = 2, permanent = true, weight = 0, radius = 4 },
+	ruin = { name = "Broken Ruin", category = "structure", hp = 400, frag = 250, xp = 50, minTier = 3, permanent = true, weight = 6, radius = 7 },
+	capsule = { name = "Glitch Capsule", category = "echo", hp = 80, frag = 0, xp = 60, minTier = 1, permanent = true, weight = 0, radius = 4 },
+	anomaly = { name = "Glitch Obelisk", category = "energy", hp = 400, frag = 450, xp = 100, minTier = 3, permanent = true, weight = 0, radius = 4 },
 	-- renewable fragment sources (tier-gated income scaling)
 	bloom = { name = "Glitch Bloom", category = "energy", hp = 14, frag = 14, xp = 1, minTier = 1, renew = 30, radius = 3 },
 	prism_vein = { name = "Prism Vein", category = "crystal", hp = 60, frag = 90, xp = 3, minTier = 2, renew = 45, radius = 3 },
 	surge_node = { name = "Surge Node", category = "energy", hp = 240, frag = 340, xp = 8, minTier = 3, renew = 60, radius = 4 },
-	rift_core = { name = "Rift Core", category = "energy", hp = 900, frag = 1200, xp = 20, minTier = 4, renew = 90, radius = 5 },
+	rift_core = { name = "Rift Core", category = "energy", hp = 750, frag = 1200, xp = 20, minTier = 4, renew = 90, radius = 5 },
 }
 
 -- one-off secret pickups (hidden fragment shards): collected by walking up and pressing the prompt

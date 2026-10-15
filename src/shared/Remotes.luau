@@ -16,6 +16,7 @@ local EVENTS = {
 	-- client -> server
 	"AbsorbControl", -- ("start", targetId) / ("stop")
 	"UseGadget", -- (gadgetId)
+	"ClientReady", -- () the client connected its handlers; the server may now send the initial state
 }
 local FUNCTIONS = {
 	"Buy", -- (category, id) -> result

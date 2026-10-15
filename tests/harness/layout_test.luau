@@ -205,29 +205,38 @@ for _, vp in viewports do
 		end
 	end
 	problems += textFit(gui, label .. " HUD", w, h)
-	-- every panel: fits the screen, and its texts fit
+	-- every panel (and every tab of it): fits the screen, and its texts fit
+	local tabsOf = { equipment = { "Absorber", "Backpack", "Boots", "Gadgets" }, goals = { "Journey", "Milestones", "Secrets" } }
 	for _, menu in { "equipment", "echoes", "research", "goals", "settings" } do
-		Menus.open(menu)
-		M.advance(0.2)
-		local panel
-		for _, c in gui:GetChildren() do if c:IsA("Frame") and c.Visible and c.Size.X.Scale == 0.94 then panel = c end end
-		if panel then
-			local r = rectOf(panel, w, h)
-			if r.x < 0 or r.y < 0 or r.x + r.w > w or r.y + r.h > h then problems += 1; print(("  [%s] panel %s off-screen"):format(label, menu)) end
-			if r.w < 300 or r.h < 220 then problems += 1; print(("  [%s] panel %s too small %dx%d"):format(label, menu, r.w, r.h)) end
-			problems += textFit(panel, label .. " " .. menu, w, h)
-			-- containment: absolutely placed children must stay inside the panel (scrolling lists are exempt)
-			for _, o in panel:GetDescendants() do
-				if o:IsA("GuiObject") and visible(o) and not o:FindFirstAncestorOfClass("ScrollingFrame") then
-					local rr = rectOf(o, w, h)
-					if rr and (rr.x < r.x - 1 or rr.y < r.y - 1 or rr.x + rr.w > r.x + r.w + 1 or rr.y + rr.h > r.y + r.h + 1) then
-						problems += 1
-						print(("  [%s] %s: %s (%s) sticks out of the panel by %d px"):format(label, menu, o.Name, o.ClassName, math.max(rr.y + rr.h - (r.y + r.h), rr.x + rr.w - (r.x + r.w), r.x - rr.x, r.y - rr.y)))
+		for _, tabName in (tabsOf[menu] or { false }) do
+			Menus.open(menu)
+			M.advance(0.2)
+			local panel
+			for _, c in gui:GetChildren() do if c:IsA("Frame") and c.Visible and c.Size.X.Scale == 0.94 then panel = c end end
+			if panel and tabName then
+				for _, b in panel:GetDescendants() do
+					if b:IsA("TextButton") and b.Text == tabName then M.getSignal(b, "Activated"):Fire() end
+				end
+				M.advance(0.2)
+			end
+			local what = menu .. (if tabName then "/" .. tabName else "")
+			if panel then
+				local r = rectOf(panel, w, h)
+				if r.x < 0 or r.y < 0 or r.x + r.w > w or r.y + r.h > h then problems += 1; print(("  [%s] panel %s off-screen"):format(label, what)) end
+				if r.w < 300 or r.h < 220 then problems += 1; print(("  [%s] panel %s too small %dx%d"):format(label, what, r.w, r.h)) end
+				problems += textFit(panel, label .. " " .. what, w, h)
+				for _, o in panel:GetDescendants() do
+					if o:IsA("GuiObject") and visible(o) and not o:FindFirstAncestorOfClass("ScrollingFrame") then
+						local rr = rectOf(o, w, h)
+						if rr and (rr.x < r.x - 1 or rr.y < r.y - 1 or rr.x + rr.w > r.x + r.w + 1 or rr.y + rr.h > r.y + r.h + 1) then
+							problems += 1
+							print(("  [%s] %s: %s (%s) sticks out of the panel"):format(label, what, o.Name, o.ClassName))
+						end
 					end
 				end
+			else
+				problems += 1; print(("  [%s] panel %s did not open"):format(label, what))
 			end
-		else
-			problems += 1; print(("  [%s] panel %s did not open"):format(label, menu))
 		end
 	end
 	Menus.close()

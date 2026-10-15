@@ -13,6 +13,9 @@ local Menus = require(Client.Menus)
 local Sfx = require(Client.Sfx)
 
 local StarterGui = game:GetService("StarterGui")
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
 local player = Players.LocalPlayer
 
 local gui = Instance.new("ScreenGui")
@@ -89,3 +92,6 @@ RunService.Heartbeat:Connect(function(dt)
 		Hud.tick()
 	end
 end)
+
+-- tell the server every handler is connected: only now does it send the initial state / restoration snapshot
+Remotes.get("ClientReady"):FireServer()

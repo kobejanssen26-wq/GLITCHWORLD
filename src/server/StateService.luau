@@ -64,8 +64,8 @@ function StateService.markDirty(session: Sessions.Session)
 end
 
 function StateService.pushNow(session: Sessions.Session)
-	if not session.player.Parent then
-		return
+	if not session.player.Parent or not session.ready then
+		return -- before the client signalled ready the push would be dropped; the initial send covers it
 	end
 	dirty[session] = nil
 	session.lastSent = os.clock()

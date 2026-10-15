@@ -124,6 +124,8 @@ local function register(model: Model)
 		corrupted = cParts, restored = rParts, cFx = cFx, rFx = rFx, shown = "corrupted", fade = 0,
 	}
 	TargetVisuals.entries[id] = entry
+	applyFlags(entry, "corrupted") -- until the server snapshot arrives every target shows only its corrupted look
+	setAlpha(entry, 0)
 	for _, d in model:GetDescendants() do
 		if d:IsA("BasePart") and (d:GetAttribute("Bob") or d:GetAttribute("Spin")) then
 			local group = nil

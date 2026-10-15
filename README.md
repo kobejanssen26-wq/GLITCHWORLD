@@ -15,6 +15,11 @@ the scripts in `src/`, so this is a plain [Rojo](https://rojo.space) project wit
 
 ## Quick start
 
+**Fastest:** open `dist/GlitchWorld.rbxl` in Roblox Studio (built with Rojo 7.5.1 from this commit; rebuild it with
+step 2 below after changing any script) and press **Play**. Do step 3 first if you want saving to work.
+
+**From source:**
+
 1. Install Rojo 7 (CLI + Studio plugin): <https://rojo.space/docs/v7/getting-started/installation/>
 2. `rojo build default.project.json -o GlitchWorld.rbxl`, open it in Studio (or `rojo serve` and press *Connect*).
 3. Studio: **Game Settings > Security > Enable Studio Access to API Services** (needed for DataStore saving; without
@@ -168,6 +173,8 @@ Be explicit about the gaps; these need a real Studio session:
   `Config.Sounds.music.id` to an audio asset you own. Replace the other ids in `Config.Sounds` for real SFX.
 * **Performance.** About 2.8k parts and 47 particle emitters in the world, bounded effect counts, bobbing only near
   the camera. Measured nowhere; profile on a low-end phone.
+* **Join sequence.** The server only sends the initial state and spawns the character after the client says it is
+  ready (handlers connected), because remote events fired earlier would be lost. Tested with the mock only.
 * **Per-player visuals** use client-side `LocalTransparencyModifier`, `CanCollide` and terrain colour overrides.
   This relies on documented client-local behaviour that the mock cannot confirm.
 

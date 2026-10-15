@@ -17,6 +17,7 @@ export type Session = {
 	lastProgressSent: number,
 	lastFullWarn: number,
 	busy: boolean, -- purchase / sell lock: one mutation at a time per player
+	ready: boolean, -- client connected its handlers (events sent earlier would be lost)
 	deniedTier: { [string]: boolean }, -- targets we already told the player they cannot absorb yet
 }
 
@@ -36,6 +37,7 @@ function Sessions.create(player: Player, profile: any): Session
 		lastProgressSent = 0,
 		lastFullWarn = 0,
 		busy = false,
+		ready = false,
 		deniedTier = {},
 	}
 	byPlayer[player] = s

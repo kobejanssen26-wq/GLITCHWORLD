@@ -30,6 +30,7 @@ local function eventsOf(player, remote, kind)
 end
 local function join(name, uid)
 	local p = M.newPlayer(name, uid)
+	fire("ClientReady", p)
 	M.joinAsServer(p)
 	M.advance(3)
 	return p
@@ -265,6 +266,36 @@ S6.profile.credits += 7
 for _, fn in M.bindToClose do fn() end
 eq(M.datastore.data[KEY].data.credits, S6.profile.credits, "BindToClose saved latest state")
 check(M.datastore.data[KEY].lock == nil, "BindToClose released the lock")
+
+-- ===== initial state waits for the client handshake =====
+local PZ = M.newPlayer("Zed", 5005)
+M.joinAsServer(PZ); M.advance(3)
+check(Sessions.get(PZ) ~= nil, "Zed has a session")
+eq(#eventsOf(PZ, "State"), 0, "no state is sent before the client is ready (it would be lost)")
+fire("ClientReady", PZ); M.advance(0.5)
+check(#eventsOf(PZ, "State") >= 1 and #eventsOf(PZ, "TargetSnapshot") == 1, "state + snapshot sent once the client is ready")
+fire("ClientReady", PZ); fire("ClientReady", PZ); fire("ClientReady", PZ); fire("ClientReady", PZ); fire("ClientReady", PZ); M.advance(0.5)
+check(#eventsOf(PZ, "TargetSnapshot") <= 4, "ready spam is rate limited")
+
+-- ===== missing / deleted targets =====
+local victim = workspace.World.Targets:FindFirstChild("T_start_grass_3")
+local SZ = Sessions.get(PZ)
+M.teleport(PZ, WorldData.ById.start_grass_3.x + 3, 5, WorldData.ById.start_grass_3.z)
+victim:Destroy()
+fire("AbsorbControl", PZ, "start", "start_grass_3")
+M.advance(8)
+check(SZ.profile.restored.start_grass_3 == nil, "a deleted target cannot be restored")
+eq(SZ.absorb, nil, "no absorb session on a deleted target")
+-- target deleted while being absorbed
+local g4 = WorldData.ById.start_grass_4
+M.teleport(PZ, g4.x + 3, 5, g4.z)
+fire("AbsorbControl", PZ, "start", "start_grass_4")
+M.advance(1)
+workspace.World.Targets:FindFirstChild("T_start_grass_4"):Destroy()
+M.advance(6)
+check(SZ.profile.restored.start_grass_4 == nil, "target deleted mid-absorb pays nothing")
+eq(SZ.absorb, nil, "absorb stopped when the target vanished")
+eq(#M.errors, 0, "deleted targets cause no script errors: " .. table.concat(M.errors, "\n"))
 
 -- ===== second player isolation (shared world, separate progress) =====
 local PB = join("Bob", 2002)

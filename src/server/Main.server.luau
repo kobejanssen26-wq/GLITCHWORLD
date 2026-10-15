@@ -37,6 +37,42 @@ local world = WorldBuilder.build()
 Interactions.bind(world)
 DataService.startAutosave(60)
 
+-- Remote events fired before the client connected a handler are lost, so the initial state is only sent once BOTH
+-- the session exists (data loaded) and the client said it is ready (whichever happens last triggers the send).
+local clientReady: { [Player]: boolean } = {}
+
+local initialSent: { [Player]: boolean } = {}
+
+local function sendInitial(player: Player, force: boolean)
+	local session = Sessions.get(player)
+	if not session or not clientReady[player] or (initialSent[player] and not force) then
+		return
+	end
+	initialSent[player] = true
+	local profile = session.profile
+	local restored, secrets = {}, {}
+	for id in profile.restored do
+		table.insert(restored, id)
+	end
+	for id in profile.secrets do
+		table.insert(secrets, id)
+	end
+	Remotes.get("TargetSnapshot"):FireClient(player, { restored = restored, secrets = secrets })
+	StateService.pushNow(session)
+end
+
+Remotes.get("ClientReady").OnServerEvent:Connect(function(player: Player)
+	if not RateLimit.allow(player, "ready", 0.5, 3) then
+		return
+	end
+	clientReady[player] = true
+	local session = Sessions.get(player)
+	if session then
+		session.ready = true
+	end
+	sendInitial(player, true) -- an explicit (re)request always gets a fresh snapshot
+end)
+
 local function loadCharacter(player: Player)
 	if player.Parent then
 		player:LoadCharacterAsync()
@@ -75,20 +111,19 @@ local function onPlayerAdded(player: Player)
 		return
 	end
 	local session = Sessions.create(player, profile)
+	session.ready = clientReady[player] == true
 	player.CharacterAdded:Connect(function(char)
 		onCharacter(player, char)
 	end)
 	ProgressService.commit(session) -- derived progress (and publishes equipped echoes)
-
-	local restored, secrets = {}, {}
-	for id in profile.restored do
-		table.insert(restored, id)
+	-- spawn only once the client has applied its per-player world state (otherwise corrupted + restored looks overlap
+	-- for a moment); a slow/broken client is not waited for more than 10 seconds
+	local waited = 0
+	while not clientReady[player] and player.Parent and waited < 10 do
+		task.wait(0.1)
+		waited += 0.1
 	end
-	for id in profile.secrets do
-		table.insert(secrets, id)
-	end
-	Remotes.get("TargetSnapshot"):FireClient(player, { restored = restored, secrets = secrets })
-	StateService.pushNow(session)
+	sendInitial(player, false)
 	loadCharacter(player)
 end
 
@@ -98,6 +133,8 @@ local function onPlayerRemoving(player: Player)
 		RestorationService.forget(session)
 		StateService.forget(session)
 	end
+	clientReady[player] = nil
+	initialSent[player] = nil
 	DataService.save(player, true) -- final save; clears the session lock
 	DataService.release(player)
 	Sessions.remove(player)

@@ -841,6 +841,7 @@ classMethods.DataStoreService = { GetDataStore = function() return storeObj end 
 game.JobId = "job-A"
 M.bindToClose = {}
 classMethods.DataModel = {
+	IsLoaded = function() return true end,
 	GetService = function(g, name)
 		local s = services[name]
 		if not s then error("unknown service " .. tostring(name), 2) end

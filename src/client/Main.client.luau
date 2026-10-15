@@ -38,9 +38,17 @@ local function safe(name: string, fn: () -> ())
 end
 
 -- the default hotbar / health bar are not used by this game
-pcall(function()
-	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
-	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
+task.spawn(function()
+	for _ = 1, 10 do -- SetCoreGuiEnabled fails until the core scripts have registered; retry briefly
+		local ok = pcall(function()
+			StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+			StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
+		end)
+		if ok then
+			return
+		end
+		task.wait(0.5)
+	end
 end)
 
 -- state first: everything else renders from it

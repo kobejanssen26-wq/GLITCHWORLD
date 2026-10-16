@@ -737,6 +737,10 @@ local DataStoreService = service("DataStoreService")
 service("StarterGui")
 
 classMethods.Players_ = nil
+classMethods.Humanoid = {
+	GetState = function(h) return Enum.HumanoidStateType[data[h].state or "Running"] end,
+	ChangeState = function(h, s) data[h].state = s.Name end,
+}
 classMethods.Camera = {
 	ViewportPointToRay = function(cam, x, y)
 		local c = data[cam].props.CFrame or CF.identity
@@ -892,6 +896,9 @@ classMethods.Player = {
 		local hrp = create("Part", "HumanoidRootPart")
 		hrp.Parent = char
 		hrp.CFrame = CF.new(0, 5, 0)
+		local head = create("Part", "Head")
+		head.Parent = char
+		head.CFrame = CF.new(0, 7, 0)
 		char.PrimaryPart = hrp
 		char.Parent = Workspace
 		data[p].props.Character = char

@@ -29,6 +29,7 @@ function PlotService.init(world: Instance)
 		local sp = pf:WaitForChild("Marker:PlotSpawn:" .. i) :: BasePart
 		local folder = Instance.new("Folder")
 		folder.Name = "Plot" .. i
+		folder:SetAttribute("Origin", origin.CFrame) -- the client draws ores relative to this
 		folder.Parent = factories
 		plots[i] = { index = i, origin = origin.CFrame, sign = sign, spawn = sp.CFrame, folder = folder, pad = nil, owner = nil, label = nil }
 	end

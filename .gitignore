@@ -3,3 +3,4 @@
 *.rbxl.lock
 sourcemap.json
 !dist/*.rbxl
+!dist/*.rbxlx

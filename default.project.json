@@ -1,0 +1,29 @@
+{
+  "name": "Neonforge",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": { "$path": "src/shared" }
+    },
+    "ServerScriptService": {
+      "Server": { "$path": "src/server" }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": { "$path": "src/client" }
+      }
+    },
+    "Workspace": {
+      "$properties": {
+        "StreamingEnabled": true,
+        "StreamingMinRadius": 160,
+        "StreamingTargetRadius": 900,
+        "Gravity": 196.2
+      },
+      "World": { "$path": "world/World.rbxm" }
+    },
+    "Lighting": {
+      "$properties": { "Technology": "Future" }
+    }
+  }
+}
